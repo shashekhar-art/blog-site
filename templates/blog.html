@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}{% if category %}{{ category }} Articles{% elif tag %}#{{ tag }}{% elif search %}Search: {{ search }}{% else %}All Articles{% endif %} — {{ site.title }}{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <div class="page-header-bg">
+    <div class="hero-orb hero-orb-1" style="opacity:0.3"></div>
+    <div class="hero-orb hero-orb-2" style="opacity:0.2"></div>
+  </div>
+  <div class="container">
+    <div class="page-header-content" data-aos="fade-up">
+      {% if category %}
+        <h1><span class="gradient-text">{{ category }}</span> Articles</h1>
+        <p>{{ total }} article{% if total != 1 %}s{% endif %} in this category</p>
+      {% elif tag %}
+        <h1>Tagged: <span class="gradient-text">#{{ tag }}</span></h1>
+        <p>{{ total }} article{% if total != 1 %}s{% endif %} with this tag</p>
+      {% elif search %}
+        <h1>Search: <span class="gradient-text">"{{ search }}"</span></h1>
+        <p>{{ total }} result{% if total != 1 %}s{% endif %} found</p>
+      {% else %}
+        <h1>All <span class="gradient-text">Articles</span></h1>
+        <p>{{ total }} article{% if total != 1 %}s{% endif %} on AI, GenAI, and beyond</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<section class="blog-layout">
+  <div class="container">
+    <div class="blog-main-layout">
+
+      <!-- Main Content -->
+      <div class="blog-posts-column">
+
+        <!-- Search Bar -->
+        <div class="search-wrapper" data-aos="fade-up">
+          <form action="{{ url_for('blog') }}" method="get" class="search-form">
+            {% if category %}<input type="hidden" name="category" value="{{ category }}" />{% endif %}
+            <div class="search-input-wrap">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" name="search" placeholder="Search articles…" value="{{ search or '' }}" class="search-input" />
+              {% if search %}
+              <a href="{{ url_for('blog') }}" class="search-clear"><i class="fas fa-times"></i></a>
+              {% endif %}
+            </div>
+            <button type="submit" class="search-btn">Search</button>
+          </form>
+        </div>
+
+        {% if posts %}
+        <div class="blog-posts-list">
+          {% for post in posts %}
+          <article class="blog-list-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 60 }}">
+            <a href="{{ url_for('post_detail', slug=post.slug) }}" class="blog-list-link">
+              <div class="blog-list-cover {{ post.cover_gradient }}">
+                <span class="blog-list-emoji">{{ post.cover_emoji }}</span>
+              </div>
+              <div class="blog-list-body">
+                <div class="post-meta-row">
+                  <span class="category-badge {{ post.category | lower | replace(' ', '-') }}">{{ post.category }}</span>
+                  <span class="meta-dot">·</span>
+                  <span class="post-date"><i class="far fa-calendar"></i> {{ post.date | format_date }}</span>
+                  <span class="meta-dot">·</span>
+                  <span class="read-time"><i class="far fa-clock"></i> {{ post.reading_time }} min read</span>
+                </div>
+                <h2 class="blog-list-title">{{ post.title }}</h2>
+                <p class="blog-list-summary">{{ post.summary }}</p>
+                <div class="blog-list-footer">
+                  <div class="post-tags-row">
+                    {% for tag_item in post.tags[:3] %}
+                    <span class="tag">#{{ tag_item }}</span>
+                    {% endfor %}
+                  </div>
+                  <span class="read-more-link">Read More <i class="fas fa-arrow-right"></i></span>
+                </div>
+              </div>
+            </a>
+          </article>
+          {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if total_pages > 1 %}
+        <div class="pagination" data-aos="fade-up">
+          {% if page > 1 %}
+          <a href="{{ url_for('blog', page=page-1, category=category, tag=tag, search=search) }}" class="page-btn">
+            <i class="fas fa-chevron-left"></i> Previous
+          </a>
+          {% endif %}
+
+          <div class="page-numbers">
+            {% for p in range(1, total_pages + 1) %}
+            <a href="{{ url_for('blog', page=p, category=category, tag=tag, search=search) }}"
+               class="page-number {% if p == page %}active{% endif %}">{{ p }}</a>
+            {% endfor %}
+          </div>
+
+          {% if page < total_pages %}
+          <a href="{{ url_for('blog', page=page+1, category=category, tag=tag, search=search) }}" class="page-btn">
+            Next <i class="fas fa-chevron-right"></i>
+          </a>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="empty-state" data-aos="fade-up">
+          <div class="empty-icon">🔍</div>
+          <h3>No articles found</h3>
+          <p>{% if search %}No results for "{{ search }}". Try different keywords.{% else %}No articles in this category yet. Check back soon!{% endif %}</p>
+          <a href="{{ url_for('blog') }}" class="btn-primary">Browse All Articles</a>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="blog-sidebar">
+
+        <!-- Categories Widget -->
+        <div class="sidebar-widget" data-aos="fade-left">
+          <h3 class="widget-title"><i class="fas fa-layer-group"></i> Categories</h3>
+          <ul class="category-list">
+            <li>
+              <a href="{{ url_for('blog') }}" class="cat-list-item {% if not category %}active{% endif %}">
+                <span class="cat-list-name">All Topics</span>
+                <span class="cat-list-count">{{ categories.values() | sum }}</span>
+              </a>
+            </li>
+            {% for cat, count in categories.items() | sort %}
+            <li>
+              <a href="{{ url_for('blog', category=cat) }}" class="cat-list-item {% if category == cat %}active{% endif %}">
+                <span class="cat-list-name">{{ cat }}</span>
+                <span class="cat-list-count">{{ count }}</span>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Popular Tags Widget -->
+        <div class="sidebar-widget" data-aos="fade-left" data-aos-delay="100">
+          <h3 class="widget-title"><i class="fas fa-tags"></i> Popular Tags</h3>
+          <div class="sidebar-tags">
+            {% for t, count in popular_tags %}
+            <a href="{{ url_for('blog', tag=t) }}" class="sidebar-tag {% if tag == t %}active{% endif %}">#{{ t }}</a>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- About Widget -->
+        <div class="sidebar-widget about-widget" data-aos="fade-left" data-aos-delay="200">
+          <div class="sidebar-avatar">SS</div>
+          <h3>Shashi Shekhar</h3>
+          <p>AI Consultant at Deloitte. Writing about GenAI, LLMs, and practical AI implementation.</p>
+          <a href="{{ site.linkedin }}" target="_blank" class="widget-linkedin-btn">
+            <i class="fab fa-linkedin"></i> Connect on LinkedIn
+          </a>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

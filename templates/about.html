@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}About Shashi Shekhar — AI Consultant & GenAI Practitioner{% endblock %}
+{% block meta_desc %}Shashi Shekhar is an AI Consultant at Deloitte specializing in Generative AI, LLMs, and enterprise AI transformation.{% endblock %}
+
+{% block content %}
+
+<!-- About Hero -->
+<section class="about-hero">
+  <div class="about-hero-bg">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+  </div>
+  <div class="container">
+    <div class="about-hero-content" data-aos="fade-up">
+      <div class="about-avatar-wrapper">
+        <div class="about-avatar-ring"></div>
+        <div class="about-avatar">SS</div>
+        <div class="about-avatar-badge"><i class="fas fa-check"></i></div>
+      </div>
+      <div class="about-intro">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          <span>AI Consultant at Deloitte</span>
+        </div>
+        <h1>Shashi <span class="gradient-text">Shekhar</span></h1>
+        <p class="about-tagline">Generative AI Practitioner · LLM Architect · Enterprise AI Advisor</p>
+        <p class="about-description">
+          I help enterprises navigate the Generative AI revolution — from strategy and architecture to hands-on implementation of LLM-powered systems. At Deloitte, I work with Fortune 500 companies to unlock the transformative potential of AI.
+        </p>
+        <div class="about-hero-actions">
+          <a href="{{ site.linkedin }}" target="_blank" class="btn-primary">
+            <i class="fab fa-linkedin"></i> Connect on LinkedIn
+          </a>
+          <a href="mailto:{{ site.email }}" class="btn-secondary">
+            <i class="fas fa-envelope"></i> Get in Touch
+          </a>
+          <a href="{{ url_for('blog') }}" class="btn-ghost">
+            <i class="fas fa-pen"></i> Read My Blog
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Bar -->
+<section class="stats-bar">
+  <div class="container">
+    <div class="stats-bar-grid" data-aos="fade-up">
+      <div class="stats-bar-item">
+        <span class="stats-bar-number gradient-text">7+</span>
+        <span class="stats-bar-label">Years in Tech</span>
+      </div>
+      <div class="stats-bar-divider"></div>
+      <div class="stats-bar-item">
+        <span class="stats-bar-number gradient-text">50+</span>
+        <span class="stats-bar-label">AI Projects</span>
+      </div>
+      <div class="stats-bar-divider"></div>
+      <div class="stats-bar-item">
+        <span class="stats-bar-number gradient-text">20+</span>
+        <span class="stats-bar-label">Enterprise Clients</span>
+      </div>
+      <div class="stats-bar-divider"></div>
+      <div class="stats-bar-item">
+        <span class="stats-bar-number gradient-text">∞</span>
+        <span class="stats-bar-label">Curiosity</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About Content -->
+<section class="section">
+  <div class="container">
+    <div class="about-content-layout">
+
+      <!-- Main Content -->
+      <div class="about-main">
+
+        <!-- Story -->
+        <div class="about-card" data-aos="fade-up">
+          <h2><i class="fas fa-user-astronaut gradient-text"></i> My Story</h2>
+          <p>My journey into AI began when I realized that technology wasn't just changing how we work — it was fundamentally reimagining what's possible. From my early days working with traditional machine learning models to now architecting enterprise-scale Generative AI solutions, every step has been driven by one question: <em>"How can AI create real, meaningful value?"</em></p>
+          <p>At <strong>Deloitte</strong>, I sit at the intersection of cutting-edge AI research and enterprise reality. I've had the privilege of working with organizations across banking, healthcare, retail, and manufacturing to design and deploy AI systems that don't just demo well — they deliver measurable business outcomes.</p>
+          <p>When I'm not consulting, I'm writing here — breaking down complex AI concepts, sharing implementation patterns, and exploring what the future of human-AI collaboration looks like.</p>
+        </div>
+
+        <!-- Expertise -->
+        <div class="about-card" data-aos="fade-up">
+          <h2><i class="fas fa-brain gradient-text"></i> Areas of Expertise</h2>
+          <div class="expertise-grid">
+            <div class="expertise-item">
+              <div class="expertise-icon">🤖</div>
+              <h4>Large Language Models</h4>
+              <p>Architecture, fine-tuning, evaluation, and production deployment of LLMs including GPT-4, Claude, and Llama variants.</p>
+            </div>
+            <div class="expertise-item">
+              <div class="expertise-icon">🔍</div>
+              <h4>RAG Systems</h4>
+              <p>Building knowledge-grounded AI with vector databases, semantic search, hybrid retrieval, and advanced chunking strategies.</p>
+            </div>
+            <div class="expertise-item">
+              <div class="expertise-icon">🕸️</div>
+              <h4>AI Agents & Multi-Agent Systems</h4>
+              <p>Designing autonomous agents with tool use, planning, memory, and coordination using LangChain, AutoGen, and custom frameworks.</p>
+            </div>
+            <div class="expertise-item">
+              <div class="expertise-icon">⚙️</div>
+              <h4>Prompt Engineering</h4>
+              <p>Systematic prompt design, few-shot learning, chain-of-thought reasoning, and prompt optimization for production systems.</p>
+            </div>
+            <div class="expertise-item">
+              <div class="expertise-icon">🏭</div>
+              <h4>Enterprise AI Strategy</h4>
+              <p>AI readiness assessment, use case prioritization, build vs. buy analysis, and responsible AI governance frameworks.</p>
+            </div>
+            <div class="expertise-item">
+              <div class="expertise-icon">🐍</div>
+              <h4>Python & MLOps</h4>
+              <p>Python-first AI development, CI/CD for ML, model serving, monitoring, and scalable AI infrastructure on cloud platforms.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- What I Write About -->
+        <div class="about-card" data-aos="fade-up">
+          <h2><i class="fas fa-pen-nib gradient-text"></i> What I Write About</h2>
+          <div class="write-topics">
+            <div class="write-topic">
+              <span class="write-topic-icon">📊</span>
+              <div>
+                <h4>Technical Deep Dives</h4>
+                <p>Detailed explorations of LLM architectures, training techniques, and the math behind generative models.</p>
+              </div>
+            </div>
+            <div class="write-topic">
+              <span class="write-topic-icon">🛠️</span>
+              <div>
+                <h4>Implementation Guides</h4>
+                <p>Step-by-step tutorials for building production-ready AI systems with real code and real trade-offs.</p>
+              </div>
+            </div>
+            <div class="write-topic">
+              <span class="write-topic-icon">🔭</span>
+              <div>
+                <h4>AI Trends & Analysis</h4>
+                <p>Thoughtful analysis of emerging AI research, industry shifts, and what they mean for practitioners.</p>
+              </div>
+            </div>
+            <div class="write-topic">
+              <span class="write-topic-icon">💼</span>
+              <div>
+                <h4>Enterprise AI Lessons</h4>
+                <p>Honest stories from the field — what works, what doesn't, and how to navigate AI adoption at scale.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sidebar -->
+      <aside class="about-sidebar">
+
+        <!-- Tech Stack -->
+        <div class="sidebar-widget" data-aos="fade-left">
+          <h3 class="widget-title"><i class="fas fa-code"></i> Tech Stack</h3>
+          <div class="tech-stack">
+            <div class="tech-group">
+              <span class="tech-group-label">LLM Frameworks</span>
+              <div class="tech-tags">
+                <span class="tech-tag">LangChain</span>
+                <span class="tech-tag">LlamaIndex</span>
+                <span class="tech-tag">AutoGen</span>
+                <span class="tech-tag">CrewAI</span>
+              </div>
+            </div>
+            <div class="tech-group">
+              <span class="tech-group-label">Models & APIs</span>
+              <div class="tech-tags">
+                <span class="tech-tag">Claude</span>
+                <span class="tech-tag">GPT-4</span>
+                <span class="tech-tag">Llama 3</span>
+                <span class="tech-tag">Gemini</span>
+              </div>
+            </div>
+            <div class="tech-group">
+              <span class="tech-group-label">Vector Databases</span>
+              <div class="tech-tags">
+                <span class="tech-tag">Pinecone</span>
+                <span class="tech-tag">Weaviate</span>
+                <span class="tech-tag">ChromaDB</span>
+                <span class="tech-tag">pgvector</span>
+              </div>
+            </div>
+            <div class="tech-group">
+              <span class="tech-group-label">Languages & Tools</span>
+              <div class="tech-tags">
+                <span class="tech-tag">Python</span>
+                <span class="tech-tag">FastAPI</span>
+                <span class="tech-tag">Docker</span>
+                <span class="tech-tag">Azure</span>
+                <span class="tech-tag">AWS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connect -->
+        <div class="sidebar-widget connect-widget" data-aos="fade-left" data-aos-delay="100">
+          <h3 class="widget-title"><i class="fas fa-handshake"></i> Connect</h3>
+          <div class="connect-links">
+            <a href="{{ site.linkedin }}" target="_blank" class="connect-link linkedin">
+              <i class="fab fa-linkedin"></i>
+              <div>
+                <span>LinkedIn</span>
+                <small>Professional profile</small>
+              </div>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+            <a href="{{ site.github }}" target="_blank" class="connect-link github">
+              <i class="fab fa-github"></i>
+              <div>
+                <span>GitHub</span>
+                <small>Open source projects</small>
+              </div>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+            <a href="mailto:{{ site.email }}" class="connect-link email">
+              <i class="fas fa-envelope"></i>
+              <div>
+                <span>Email</span>
+                <small>{{ site.email }}</small>
+              </div>
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Availability -->
+        <div class="sidebar-widget availability-widget" data-aos="fade-left" data-aos-delay="200">
+          <div class="availability-dot"></div>
+          <h4>Open for Collaboration</h4>
+          <p>Interested in AI consulting, speaking engagements, or technical advisory? Let's connect.</p>
+          <a href="mailto:{{ site.email }}" class="btn-primary" style="width:100%; text-align:center; display:block;">
+            <i class="fas fa-paper-plane"></i> Send a Message
+          </a>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

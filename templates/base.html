@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}{{ site.title }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_desc %}{{ site.description }}{% endblock %}" />
+  <meta name="author" content="{{ site.author }}" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="{% block og_title %}{{ site.title }}{% endblock %}" />
+  <meta property="og:description" content="{% block og_desc %}{{ site.description }}{% endblock %}" />
+  <meta property="og:url" content="{{ site.url }}" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- AOS Animations -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+
+  <!-- Prism.js for code highlighting -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Reading Progress Bar -->
+  <div id="reading-progress" class="reading-progress"></div>
+
+  <!-- Navigation -->
+  <nav id="navbar" class="navbar">
+    <div class="nav-container">
+      <a href="{{ url_for('index') }}" class="nav-logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">Shashi<span class="logo-accent">AI</span></span>
+      </a>
+
+      <div class="nav-links" id="nav-links">
+        <a href="{{ url_for('index') }}" class="nav-link {% if request.endpoint == 'index' %}active{% endif %}">Home</a>
+        <a href="{{ url_for('blog') }}" class="nav-link {% if request.endpoint in ['blog', 'post_detail'] %}active{% endif %}">Blog</a>
+        <a href="{{ url_for('blog', category='LLMs') }}" class="nav-link">LLMs</a>
+        <a href="{{ url_for('blog', category='Agents') }}" class="nav-link">Agents</a>
+        <a href="{{ url_for('about') }}" class="nav-link {% if request.endpoint == 'about' %}active{% endif %}">About</a>
+        <a href="{{ site.linkedin }}" target="_blank" class="nav-cta">
+          <i class="fab fa-linkedin"></i> Connect
+        </a>
+      </div>
+
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-glow"></div>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="logo-icon">⚡</span>
+            <span class="logo-text">Shashi<span class="logo-accent">AI</span></span>
+          </div>
+          <p class="footer-bio">Exploring the frontier of Generative AI, LLMs, and intelligent systems. Helping enterprises navigate the AI revolution.</p>
+          <div class="footer-social">
+            <a href="{{ site.linkedin }}" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="{{ site.github }}" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+            <a href="{{ site.twitter }}" target="_blank" aria-label="Twitter/X"><i class="fab fa-x-twitter"></i></a>
+            <a href="mailto:{{ site.email }}" aria-label="Email"><i class="fas fa-envelope"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h4>Categories</h4>
+          <ul>
+            <li><a href="{{ url_for('blog', category='LLMs') }}">Large Language Models</a></li>
+            <li><a href="{{ url_for('blog', category='Agents') }}">AI Agents</a></li>
+            <li><a href="{{ url_for('blog', category='RAG') }}">RAG Systems</a></li>
+            <li><a href="{{ url_for('blog', category='Prompt Engineering') }}">Prompt Engineering</a></li>
+            <li><a href="{{ url_for('blog', category='GenAI') }}">Generative AI</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('blog') }}">All Articles</a></li>
+            <li><a href="{{ url_for('about') }}">About Shashi</a></li>
+            <li><a href="{{ site.linkedin }}" target="_blank">LinkedIn Profile</a></li>
+            <li><a href="mailto:{{ site.email }}">Get in Touch</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4>Stay Updated</h4>
+          <p class="footer-newsletter-text">Get the latest AI insights directly in your inbox.</p>
+          <div class="newsletter-form">
+            <input type="email" placeholder="your@email.com" class="newsletter-input" />
+            <button class="newsletter-btn">Subscribe</button>
+          </div>
+          <p class="footer-note">No spam. Unsubscribe anytime.</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; {{ 2025 }} Shashi Shekhar. Built with Python & ❤️ for the AI community.</p>
+        <p class="footer-stack">Flask · Fly.io · Markdown · Open Source</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

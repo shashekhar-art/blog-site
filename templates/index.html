@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-grid"></div>
+  </div>
+  <div class="container">
+    <div class="hero-content" data-aos="fade-up" data-aos-duration="800">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>AI & GenAI Insights</span>
+      </div>
+      <h1 class="hero-title">
+        Navigating the<br/>
+        <span class="gradient-text" id="typed-text">Generative AI</span><br/>
+        Revolution
+      </h1>
+      <p class="hero-subtitle">
+        Deep technical insights on LLMs, RAG systems, AI agents, and enterprise AI adoption — from Shashi Shekhar, AI Consultant at Deloitte.
+      </p>
+      <div class="hero-actions">
+        <a href="{{ url_for('blog') }}" class="btn-primary">
+          <i class="fas fa-rocket"></i> Explore Articles
+        </a>
+        <a href="{{ url_for('about') }}" class="btn-secondary">
+          <i class="fas fa-user"></i> About Me
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-number">{{ total_posts }}+</span>
+          <span class="stat-label">Articles</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number">{{ categories|length }}+</span>
+          <span class="stat-label">Topics</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-number">100%</span>
+          <span class="stat-label">Free</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll-hint">
+    <i class="fas fa-chevron-down"></i>
+  </div>
+</section>
+
+<!-- Featured Post -->
+{% if featured %}
+<section class="section featured-section">
+  <div class="container">
+    <div class="section-header" data-aos="fade-up">
+      <span class="section-tag"><i class="fas fa-star"></i> Featured</span>
+      <h2>Editor's Pick</h2>
+    </div>
+    <a href="{{ url_for('post_detail', slug=featured.slug) }}" class="featured-card" data-aos="fade-up" data-aos-delay="100">
+      <div class="featured-cover {{ featured.cover_gradient }}">
+        <span class="featured-emoji">{{ featured.cover_emoji }}</span>
+        <div class="featured-cover-glow"></div>
+      </div>
+      <div class="featured-body">
+        <div class="post-meta-row">
+          <span class="category-badge {{ featured.category | lower | replace(' ', '-') }}">{{ featured.category }}</span>
+          <span class="meta-dot">·</span>
+          <span class="post-date"><i class="far fa-calendar"></i> {{ featured.date | format_date }}</span>
+          <span class="meta-dot">·</span>
+          <span class="read-time"><i class="far fa-clock"></i> {{ featured.reading_time }} min read</span>
+        </div>
+        <h2 class="featured-title">{{ featured.title }}</h2>
+        <p class="featured-summary">{{ featured.summary }}</p>
+        <div class="featured-tags">
+          {% for tag in featured.tags[:4] %}
+          <span class="tag">#{{ tag }}</span>
+          {% endfor %}
+        </div>
+        <div class="featured-read-more">
+          <span>Read Article</span>
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+{% endif %}
+
+<!-- Recent Posts Grid -->
+<section class="section">
+  <div class="container">
+    <div class="section-header" data-aos="fade-up">
+      <span class="section-tag"><i class="fas fa-bolt"></i> Latest</span>
+      <h2>Recent Articles</h2>
+      <a href="{{ url_for('blog') }}" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+
+    <div class="posts-grid">
+      {% for post in recent %}
+      <article class="post-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
+        <a href="{{ url_for('post_detail', slug=post.slug) }}" class="post-card-link">
+          <div class="post-card-cover {{ post.cover_gradient }}">
+            <span class="post-card-emoji">{{ post.cover_emoji }}</span>
+          </div>
+          <div class="post-card-body">
+            <div class="post-meta-row">
+              <span class="category-badge {{ post.category | lower | replace(' ', '-') }}">{{ post.category }}</span>
+              <span class="meta-dot">·</span>
+              <span class="read-time">{{ post.reading_time }} min</span>
+            </div>
+            <h3 class="post-card-title">{{ post.title }}</h3>
+            <p class="post-card-summary">{{ post.summary[:120] }}{% if post.summary|length > 120 %}...{% endif %}</p>
+            <div class="post-card-footer">
+              <span class="post-date-small">{{ post.date | format_date }}</span>
+              <span class="read-more-arrow"><i class="fas fa-arrow-right"></i></span>
+            </div>
+          </div>
+        </a>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Categories Showcase -->
+<section class="section categories-section">
+  <div class="container">
+    <div class="section-header" data-aos="fade-up">
+      <span class="section-tag"><i class="fas fa-layer-group"></i> Explore</span>
+      <h2>Browse by Topic</h2>
+    </div>
+    <div class="categories-grid" data-aos="fade-up" data-aos-delay="100">
+      {% set cat_icons = {
+        'LLMs': ('fa-brain', 'cat-purple'),
+        'GenAI': ('fa-sparkles', 'cat-pink'),
+        'Agents': ('fa-robot', 'cat-blue'),
+        'RAG': ('fa-database', 'cat-green'),
+        'Prompt Engineering': ('fa-wand-magic-sparkles', 'cat-orange'),
+        'MLOps': ('fa-gears', 'cat-cyan'),
+        'General': ('fa-globe', 'cat-yellow'),
+      } %}
+      {% for cat, count in categories.items() %}
+      {% set icon_data = cat_icons.get(cat, ('fa-microchip', 'cat-purple')) %}
+      <a href="{{ url_for('blog', category=cat) }}" class="category-card {{ icon_data[1] }}">
+        <div class="cat-icon">
+          <i class="fas {{ icon_data[0] }}"></i>
+        </div>
+        <div class="cat-info">
+          <span class="cat-name">{{ cat }}</span>
+          <span class="cat-count">{{ count }} article{% if count != 1 %}s{% endif %}</span>
+        </div>
+        <i class="fas fa-arrow-right cat-arrow"></i>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- About Teaser -->
+<section class="section about-teaser">
+  <div class="container">
+    <div class="about-teaser-card" data-aos="fade-up">
+      <div class="about-teaser-glow"></div>
+      <div class="about-teaser-content">
+        <div class="author-avatar-large">
+          <span>SS</span>
+        </div>
+        <div class="about-teaser-text">
+          <span class="section-tag"><i class="fas fa-user-tie"></i> About the Author</span>
+          <h2>Hi, I'm Shashi Shekhar</h2>
+          <p>AI Consultant at <strong>Deloitte</strong> | Generative AI Practitioner | Helping enterprises harness the power of LLMs and AI agents to transform their operations. I write about real-world AI implementation, lessons learned, and emerging trends in the GenAI landscape.</p>
+          <div class="about-teaser-actions">
+            <a href="{{ url_for('about') }}" class="btn-primary">
+              <i class="fas fa-user"></i> Full Profile
+            </a>
+            <a href="{{ site.linkedin }}" target="_blank" class="btn-secondary">
+              <i class="fab fa-linkedin"></i> LinkedIn
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Popular Tags -->
+{% if popular_tags %}
+<section class="section tags-section">
+  <div class="container">
+    <div class="section-header" data-aos="fade-up">
+      <span class="section-tag"><i class="fas fa-tags"></i> Tags</span>
+      <h2>Popular Topics</h2>
+    </div>
+    <div class="tags-cloud" data-aos="fade-up" data-aos-delay="100">
+      {% for tag, count in popular_tags %}
+      <a href="{{ url_for('blog', tag=tag) }}" class="tag-cloud-item">
+        #{{ tag }} <span class="tag-count">{{ count }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}

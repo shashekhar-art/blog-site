@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}404 — Page Not Found{% endblock %}
+{% block content %}
+<div style="min-height:80vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:2rem;">
+  <div data-aos="fade-up">
+    <div style="font-size:6rem; margin-bottom:1rem;">🤖</div>
+    <h1 style="font-size:4rem; font-weight:900; background:linear-gradient(135deg,#7c3aed,#3b82f6); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">404</h1>
+    <h2 style="color:#e2e8f0; margin-bottom:1rem;">Page Not Found</h2>
+    <p style="color:#94a3b8; max-width:400px; margin:0 auto 2rem;">The AI hallucinated this page. Let's get you back to the real content.</p>
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+      <a href="{{ url_for('index') }}" class="btn-primary"><i class="fas fa-home"></i> Go Home</a>
+      <a href="{{ url_for('blog') }}" class="btn-secondary"><i class="fas fa-newspaper"></i> Browse Articles</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
