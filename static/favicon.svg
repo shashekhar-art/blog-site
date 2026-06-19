@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Rounded square background -->
+  <rect width="64" height="64" rx="14" fill="url(#g)"/>
+  <!-- Inner subtle highlight -->
+  <rect width="64" height="64" rx="14" fill="white" opacity="0.07"/>
+  <!-- Lightning bolt — scaled to 64x64 -->
+  <path d="M40,6 L22,34 L34,34 L24,58 L42,30 L30,30 Z"
+        fill="white" opacity="0.95" filter="url(#glow)"/>
+</svg>
