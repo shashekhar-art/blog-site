@@ -16,7 +16,7 @@ POSTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'content', 
 POSTS_PER_PAGE = 6
 
 SITE_CONFIG = {
-    'title': 'Thinking in Tokens | Shashi Shekhar',
+    'title': 'Shashi Shekhar Insights',
     'author': 'Shashi Shekhar',
     'description': 'Deep dives into Generative AI, LLMs, DeepEval, and AI agents — by Shashi Shekhar, AI Consultant at Deloitte.',
     'url': 'https://shashi-ai-blog.fly.dev',
