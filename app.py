@@ -18,7 +18,7 @@ POSTS_PER_PAGE = 6
 SITE_CONFIG = {
     'title': 'Shashi Shekhar Insights',
     'author': 'Shashi Shekhar',
-    'description': 'Deep dives into Generative AI, LLMs, DeepEval, and AI agents — by Shashi Shekhar, AI Consultant at Deloitte.',
+    'description': 'Exploring Python, AI, GenAI, Data Science & Technology',
     'url': 'https://shashi-ai-blog.fly.dev',
     'linkedin': 'https://www.linkedin.com/in/shashi-shekhar-18octo/',
     'github': 'https://github.com/shashi-shekhar',
