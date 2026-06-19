@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard — {{ site.title }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #060610; color: #e2e8f0; min-height: 100vh; }
+
+    /* Nav */
+    .admin-nav {
+      background: rgba(6,6,16,0.95);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .admin-nav .logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: #f8fafc; text-decoration: none; font-size: 1rem; }
+    .logo-accent { background: linear-gradient(135deg,#7c3aed,#3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-btn {
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+      border: none;
+    }
+    .nav-btn.secondary { background: rgba(255,255,255,0.06); color: #94a3b8; border: 1px solid rgba(255,255,255,0.08); }
+    .nav-btn.secondary:hover { background: rgba(255,255,255,0.1); color: #e2e8f0; }
+    .nav-btn.danger { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+    .nav-btn.danger:hover { background: rgba(239,68,68,0.2); }
+
+    /* Main */
+    .main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+    /* Flash */
+    .flash {
+      border-radius: 10px;
+      padding: 0.85rem 1.2rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .flash.success { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25); color: #6ee7b7; }
+    .flash.info    { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.25); color: #93c5fd; }
+
+    /* Header row */
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .page-header h1 { font-size: 1.75rem; font-weight: 800; }
+    .page-header h1 span { background: linear-gradient(135deg,#7c3aed,#3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .btn-new {
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      color: white;
+      padding: 0.65rem 1.4rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: opacity 0.2s;
+    }
+    .btn-new:hover { opacity: 0.88; }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      padding: 1.2rem 1.4rem;
+    }
+    .stat-card .stat-val { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg,#7c3aed,#3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-card .stat-label { font-size: 0.8rem; color: #64748b; margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.04em; }
+
+    /* Table */
+    .table-wrap {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: rgba(255,255,255,0.04);
+      padding: 0.9rem 1.2rem;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748b;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.03); }
+    td { padding: 1rem 1.2rem; font-size: 0.88rem; vertical-align: middle; }
+    .post-emoji { font-size: 1.4rem; }
+    .post-title { font-weight: 600; color: #f1f5f9; }
+    .post-title a { color: inherit; text-decoration: none; }
+    .post-title a:hover { color: #a78bfa; }
+    .post-date { color: #64748b; font-size: 0.82rem; }
+    .cat-badge {
+      display: inline-block;
+      padding: 0.25rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(124,58,237,0.15);
+      color: #a78bfa;
+      border: 1px solid rgba(124,58,237,0.25);
+    }
+    .featured-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.78rem;
+      color: #fbbf24;
+    }
+    .actions { display: flex; gap: 0.5rem; }
+    .btn-edit, .btn-del {
+      padding: 0.4rem 0.85rem;
+      border-radius: 7px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .btn-edit { background: rgba(59,130,246,0.14); color: #93c5fd; border: 1px solid rgba(59,130,246,0.25); }
+    .btn-edit:hover { background: rgba(59,130,246,0.24); }
+    .btn-del { background: rgba(239,68,68,0.12); color: #fca5a5; border: 1px solid rgba(239,68,68,0.2); }
+    .btn-del:hover { background: rgba(239,68,68,0.22); }
+    .empty { text-align: center; padding: 4rem 2rem; color: #475569; }
+    .empty i { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+
+    /* Confirm modal */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #0f0f1e;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 90%;
+    }
+    .modal h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
+    .modal p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+    .modal-cancel {
+      background: rgba(255,255,255,0.06);
+      color: #94a3b8;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 0.55rem 1.2rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .modal-confirm {
+      background: rgba(239,68,68,0.8);
+      color: white;
+      border: none;
+      padding: 0.55rem 1.2rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="admin-nav">
+  <a href="{{ url_for('admin_dashboard') }}" class="logo">
+    ⚡ Shashi Shekhar<span class="logo-accent"> Insights</span>
+  </a>
+  <div class="nav-right">
+    <a href="{{ url_for('index') }}" class="nav-btn secondary" target="_blank">
+      <i class="fas fa-external-link-alt"></i> View Blog
+    </a>
+    <a href="{{ url_for('admin_logout') }}" class="nav-btn danger">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+  </div>
+</nav>
+
+<div class="main">
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="flash {{ cat }}">
+      <i class="fas fa-{{ 'check-circle' if cat == 'success' else 'info-circle' }}"></i> {{ msg }}
+    </div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="page-header">
+    <h1>Admin <span>Dashboard</span></h1>
+    <a href="{{ url_for('admin_new') }}" class="btn-new">
+      <i class="fas fa-plus"></i> New Post
+    </a>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-val">{{ posts|length }}</div>
+      <div class="stat-label">Total Posts</div>
+    </div>
+    {% set cats = posts | map(attribute='category') | list | unique | list %}
+    <div class="stat-card">
+      <div class="stat-val">{{ cats|length }}</div>
+      <div class="stat-label">Categories</div>
+    </div>
+    {% set featured_count = posts | selectattr('featured') | list | length %}
+    <div class="stat-card">
+      <div class="stat-val">{{ featured_count }}</div>
+      <div class="stat-label">Featured</div>
+    </div>
+    {% set total_words = posts | sum(attribute='reading_time') %}
+    <div class="stat-card">
+      <div class="stat-val">{{ total_words }}</div>
+      <div class="stat-label">Total Min Read</div>
+    </div>
+  </div>
+
+  <!-- Posts table -->
+  <div class="table-wrap">
+    {% if posts %}
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th>Title</th>
+          <th>Date</th>
+          <th>Category</th>
+          <th>Read</th>
+          <th>Featured</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for post in posts %}
+        <tr>
+          <td class="post-emoji">{{ post.cover_emoji }}</td>
+          <td class="post-title">
+            <a href="{{ url_for('post_detail', slug=post.slug) }}" target="_blank">{{ post.title }}</a>
+          </td>
+          <td class="post-date">{{ post.date | format_date }}</td>
+          <td><span class="cat-badge">{{ post.category }}</span></td>
+          <td class="post-date">{{ post.reading_time }}m</td>
+          <td>
+            {% if post.featured %}
+            <span class="featured-dot"><i class="fas fa-star"></i> Yes</span>
+            {% else %}
+            <span style="color:#334155;">—</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="actions">
+              <a href="{{ url_for('admin_edit', slug=post.slug) }}" class="btn-edit">
+                <i class="fas fa-pen"></i> Edit
+              </a>
+              <button class="btn-del" onclick="confirmDelete('{{ post.slug }}', '{{ post.title | e }}')">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">
+      <i class="fas fa-feather-alt"></i>
+      <p>No posts yet. <a href="{{ url_for('admin_new') }}" style="color:#a78bfa;">Write your first post →</a></p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>Delete post?</h3>
+    <p id="deleteMsg">This action cannot be undone.</p>
+    <form method="POST" id="deleteForm">
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="modal-confirm"><i class="fas fa-trash"></i> Delete</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function confirmDelete(slug, title) {
+  document.getElementById('deleteMsg').textContent = 'Delete "' + title + '"? This cannot be undone.';
+  document.getElementById('deleteForm').action = '/admin/delete/' + slug;
+  document.getElementById('deleteModal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('deleteModal').classList.remove('open');
+}
+document.getElementById('deleteModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>

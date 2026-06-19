@@ -59,6 +59,11 @@
         <a href="{{ site.linkedin }}" target="_blank" class="nav-cta">
           <i class="fab fa-linkedin"></i> Connect
         </a>
+        {% if session.get('admin') %}
+        <a href="{{ url_for('admin_dashboard') }}" class="nav-link" title="Admin Panel" style="opacity:0.6;">
+          <i class="fas fa-cog"></i>
+        </a>
+        {% endif %}
       </div>
 
       <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">

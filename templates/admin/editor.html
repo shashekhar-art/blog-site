@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ 'Edit Post' if post else 'New Post' }} — {{ site.title }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css"/>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: #060610; color: #e2e8f0; min-height: 100vh; }
+
+    /* Nav */
+    .admin-nav {
+      background: rgba(6,6,16,0.95);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      padding: 0 2rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .nav-left { display: flex; align-items: center; gap: 1rem; }
+    .nav-logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: #f8fafc; text-decoration: none; font-size: 1rem; }
+    .logo-accent { background: linear-gradient(135deg,#7c3aed,#3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav-sep { color: rgba(255,255,255,0.2); }
+    .nav-page { color: #94a3b8; font-size: 0.9rem; }
+    .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-btn {
+      padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.82rem; font-weight: 600;
+      font-family: inherit; cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      transition: all 0.2s; border: none;
+    }
+    .nav-btn.secondary { background: rgba(255,255,255,0.06); color: #94a3b8; border: 1px solid rgba(255,255,255,0.08); }
+    .nav-btn.secondary:hover { background: rgba(255,255,255,0.1); color: #e2e8f0; }
+    .nav-btn.primary {
+      background: linear-gradient(135deg,#7c3aed,#3b82f6);
+      color: white;
+    }
+    .nav-btn.primary:hover { opacity: 0.88; }
+
+    /* Layout */
+    .editor-layout { display: grid; grid-template-columns: 1fr 340px; gap: 1.5rem; max-width: 1300px; margin: 0 auto; padding: 2rem; }
+    @media(max-width: 900px) { .editor-layout { grid-template-columns: 1fr; } }
+
+    /* Content area */
+    .editor-main {}
+
+    /* Sidebar */
+    .editor-sidebar {}
+
+    /* Section card */
+    .card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .card-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: #64748b;
+      margin-bottom: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Form elements */
+    .form-group { margin-bottom: 1.1rem; }
+    .form-group:last-child { margin-bottom: 0; }
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    input[type=text], input[type=date], textarea, select {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 9px;
+      padding: 0.65rem 0.9rem;
+      color: #f1f5f9;
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: #7c3aed; }
+    select option { background: #0f0f1e; }
+    textarea { resize: vertical; min-height: 80px; }
+    .title-input { font-size: 1.05rem; font-weight: 600; }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0;
+    }
+    .toggle-label { font-size: 0.875rem; color: #94a3b8; }
+    .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.1);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      left: 3px; top: 3px;
+      background: #64748b;
+      border-radius: 50%;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .toggle input:checked + .toggle-slider { background: rgba(124,58,237,0.3); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: #a78bfa; }
+
+    /* Gradient picker */
+    .gradient-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.5rem; }
+    .grad-option { position: relative; }
+    .grad-option input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .grad-swatch {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .grad-swatch:hover { transform: scale(1.08); }
+    .grad-option input:checked + .grad-swatch { border-color: white; }
+    .g1 { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+    .g2 { background: linear-gradient(135deg, #ec4899, #db2777); }
+    .g3 { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .g4 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .g5 { background: linear-gradient(135deg, #10b981, #059669); }
+    .g6 { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+    /* Emoji picker */
+    .emoji-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .emoji-opt { position: relative; }
+    .emoji-opt input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .emoji-btn {
+      display: block;
+      font-size: 1.3rem;
+      padding: 0.3rem 0.4rem;
+      border-radius: 7px;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      background: rgba(255,255,255,0.04);
+      transition: all 0.15s;
+      line-height: 1;
+    }
+    .emoji-btn:hover { background: rgba(255,255,255,0.1); }
+    .emoji-opt input:checked + .emoji-btn { border-color: #7c3aed; background: rgba(124,58,237,0.15); }
+
+    /* Tags input */
+    .tags-hint { font-size: 0.75rem; color: #475569; margin-top: 0.35rem; }
+
+    /* EasyMDE overrides */
+    .CodeMirror {
+      background: #0a0a18 !important;
+      color: #e2e8f0 !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      font-size: 0.9rem !important;
+      border: none !important;
+      min-height: 500px;
+    }
+    .editor-toolbar {
+      background: #0f0f22 !important;
+      border-color: rgba(255,255,255,0.08) !important;
+    }
+    .editor-toolbar a { color: #94a3b8 !important; }
+    .editor-toolbar a:hover, .editor-toolbar a.active { color: #a78bfa !important; background: rgba(124,58,237,0.15) !important; }
+    .editor-toolbar i.separator { border-color: rgba(255,255,255,0.1) !important; }
+    .EasyMDEContainer .CodeMirror-scroll { min-height: 460px; }
+    .editor-preview, .editor-preview-side {
+      background: #0a0a18 !important;
+      color: #e2e8f0 !important;
+      font-family: 'Inter', sans-serif !important;
+    }
+    .editor-preview pre, .editor-preview-side pre { background: #13131f !important; }
+    .EasyMDEContainer { border: 1px solid rgba(255,255,255,0.08) !important; border-radius: 12px !important; overflow: hidden !important; }
+    .editor-statusbar { background: #0f0f22 !important; color: #475569 !important; border-color: rgba(255,255,255,0.06) !important; }
+    .editor-preview h1, .editor-preview h2, .editor-preview h3 { color: #f1f5f9 !important; }
+    .editor-preview a { color: #a78bfa !important; }
+    .editor-preview code { background: rgba(124,58,237,0.15) !important; color: #c4b5fd !important; padding: 0.1em 0.3em; border-radius: 3px; }
+    .editor-preview blockquote { border-left-color: #7c3aed !important; color: #94a3b8 !important; }
+    .editor-preview table th, .editor-preview table td { border-color: rgba(255,255,255,0.1) !important; }
+
+    /* Publish button */
+    .publish-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #7c3aed, #3b82f6);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.9rem;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-bottom: 0.75rem;
+    }
+    .publish-btn:hover { opacity: 0.9; }
+    .publish-btn:active { transform: scale(0.98); }
+
+    /* Flash */
+    .flash {
+      border-radius: 10px;
+      padding: 0.85rem 1.2rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .flash.success { background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.25); color: #6ee7b7; }
+    .flash.info    { background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.25); color: #93c5fd; }
+  </style>
+</head>
+<body>
+
+<nav class="admin-nav">
+  <div class="nav-left">
+    <a href="{{ url_for('admin_dashboard') }}" class="nav-logo">⚡ Shashi Shekhar<span class="logo-accent"> Insights</span></a>
+    <span class="nav-sep">/</span>
+    <span class="nav-page">{{ 'Edit Post' if post else 'New Post' }}</span>
+  </div>
+  <div class="nav-right">
+    <a href="{{ url_for('admin_dashboard') }}" class="nav-btn secondary">
+      <i class="fas fa-arrow-left"></i> Dashboard
+    </a>
+    {% if post %}
+    <a href="{{ url_for('post_detail', slug=post.slug) }}" target="_blank" class="nav-btn secondary">
+      <i class="fas fa-eye"></i> View Live
+    </a>
+    {% endif %}
+  </div>
+</nav>
+
+<form method="POST" id="post-form">
+<div class="editor-layout">
+
+  <!-- Main: content editor -->
+  <div class="editor-main">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+      <div class="flash {{ cat }}"><i class="fas fa-check-circle"></i> {{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- Title -->
+    <div class="card">
+      <div class="form-group" style="margin-bottom:0">
+        <label><i class="fas fa-heading"></i> Post Title</label>
+        <input type="text" name="title" class="title-input"
+               value="{{ post.title if post else '' }}"
+               placeholder="Write a compelling title..."
+               required/>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="card">
+      <div class="form-group" style="margin-bottom:0">
+        <label><i class="fas fa-align-left"></i> Summary / Excerpt</label>
+        <textarea name="summary" rows="2" placeholder="One or two sentences that hook the reader...">{{ post.summary if post else '' }}</textarea>
+      </div>
+    </div>
+
+    <!-- Markdown Editor -->
+    <div class="card" style="padding:0; overflow:hidden; border-radius:16px;">
+      <textarea id="content" name="content">{{ post.content if post else '' }}</textarea>
+    </div>
+  </div>
+
+  <!-- Sidebar: metadata -->
+  <div class="editor-sidebar">
+
+    <!-- Publish -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-rocket"></i> Publish</div>
+      <button type="submit" class="publish-btn" id="publish-btn">
+        <i class="fas fa-{{ 'save' if post else 'paper-plane' }}"></i>
+        {{ 'Save Changes' if post else 'Publish Post' }}
+      </button>
+      {% if post %}
+      <div style="font-size:0.78rem; color:#475569; text-align:center;">
+        Slug: <code style="color:#64748b;">{{ post.slug }}</code>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Meta -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-sliders-h"></i> Post Details</div>
+
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" name="date" value="{{ post.date if post else '' }}" required/>
+      </div>
+
+      <div class="form-group">
+        <label>Category</label>
+        <select name="category">
+          {% set cats = ['GenAI', 'LLMs', 'Agents', 'RAG', 'Prompt Engineering', 'Python', 'Data Science', 'MLOps', 'General'] %}
+          {% for c in cats %}
+          <option value="{{ c }}" {{ 'selected' if post and post.category == c else '' }}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Tags</label>
+        <input type="text" name="tags" value="{{ post.tags if post else '' }}" placeholder="Python, GenAI, LLMs"/>
+        <div class="tags-hint">Comma-separated</div>
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label"><i class="fas fa-star" style="color:#fbbf24;margin-right:0.3rem;"></i> Featured post</span>
+        <label class="toggle">
+          <input type="checkbox" name="featured" {{ 'checked' if post and post.featured else '' }}/>
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Cover -->
+    <div class="card">
+      <div class="card-title"><i class="fas fa-palette"></i> Cover Style</div>
+
+      <div class="form-group">
+        <label>Gradient</label>
+        <div class="gradient-grid">
+          {% set grads = [('gradient-1','g1'),('gradient-2','g2'),('gradient-3','g3'),('gradient-4','g4'),('gradient-5','g5'),('gradient-6','g6')] %}
+          {% for val, cls in grads %}
+          <label class="grad-option">
+            <input type="radio" name="cover_gradient" value="{{ val }}"
+                   {{ 'checked' if (post and post.cover_gradient == val) or (not post and val == 'gradient-1') }}/>
+            <span class="grad-swatch {{ cls }}"></span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0">
+        <label>Cover Emoji</label>
+        <div class="emoji-grid">
+          {% set emojis = ['🤖','🧠','🚀','🔍','⚡','🪄','💡','🧪','🌐','⚖️','🕵️','📊','🔧','🎯','✨','🏗️','📝','🔬'] %}
+          {% for e in emojis %}
+          <label class="emoji-opt">
+            <input type="radio" name="cover_emoji" value="{{ e }}"
+                   {{ 'checked' if (post and post.cover_emoji == e) or (not post and e == '🤖') }}/>
+            <span class="emoji-btn">{{ e }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</form>
+
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+<script>
+const easyMDE = new EasyMDE({
+  element: document.getElementById('content'),
+  spellChecker: false,
+  autosave: {
+    enabled: true,
+    delay: 2000,
+    uniqueId: 'shashi-post-{{ post.slug if post else "new" }}',
+  },
+  minHeight: '500px',
+  toolbar: [
+    'bold','italic','strikethrough','heading','|',
+    'quote','unordered-list','ordered-list','|',
+    'link','image','table','code','horizontal-rule','|',
+    'preview','side-by-side','fullscreen','|',
+    'undo','redo','|',
+    {
+      name: 'guide',
+      action: 'https://www.markdownguide.org/basic-syntax/',
+      className: 'fa fa-question-circle',
+      title: 'Markdown Guide',
+    }
+  ],
+  previewRender: function(plainText) {
+    return this.parent.markdown(plainText);
+  },
+});
+
+// Sync EasyMDE → textarea before submit
+document.getElementById('post-form').addEventListener('submit', function(e) {
+  document.getElementById('content').value = easyMDE.value();
+  document.getElementById('publish-btn').innerHTML =
+    '<i class="fas fa-spinner fa-spin"></i> Saving...';
+  document.getElementById('publish-btn').disabled = true;
+});
+
+// Auto-set today's date for new posts
+const dateInput = document.querySelector('input[name="date"]');
+if (!dateInput.value) {
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.value = today;
+}
+</script>
+</body>
+</html>

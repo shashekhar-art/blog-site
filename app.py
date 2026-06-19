@@ -1,8 +1,11 @@
 import os
 import glob
 import math
-from datetime import datetime
-from flask import Flask, render_template, abort, request, redirect, url_for
+import hmac
+import re
+from datetime import datetime, date
+from functools import wraps
+from flask import Flask, render_template, abort, request, redirect, url_for, session, flash
 import frontmatter
 import markdown
 from markdown.extensions.codehilite import CodeHiliteExtension
@@ -11,6 +14,7 @@ from markdown.extensions.toc import TocExtension
 from markdown.extensions.tables import TableExtension
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-prod')
 
 POSTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'content', 'posts')
 POSTS_PER_PAGE = 6
@@ -26,6 +30,28 @@ SITE_CONFIG = {
     'email': 'shashekhar@deloitte.com',
     'tagline': 'Exploring the Frontier of Generative AI',
 }
+
+ADMIN_USER = os.environ.get('ADMIN_USERNAME', 'shashi')
+ADMIN_PASS = os.environ.get('ADMIN_PASSWORD', 'ShashiAdmin2026!')
+
+
+# ── helpers ──────────────────────────────────────────────────────────────────
+
+def admin_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not session.get('admin'):
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return decorated
+
+
+def slugify(text):
+    text = text.lower().strip()
+    text = re.sub(r'[^\w\s-]', '', text)
+    text = re.sub(r'[\s_-]+', '-', text)
+    text = re.sub(r'^-+|-+$', '', text)
+    return text
 
 
 def calculate_reading_time(content):
@@ -96,6 +122,50 @@ def get_all_posts():
 
     return sorted(posts, key=lambda x: x['date'] if isinstance(x['date'], datetime) else datetime.now(), reverse=True)
 
+
+def _save_post(existing_slug):
+    title = request.form.get('title', '').strip()
+    content = request.form.get('content', '').strip()
+    category = request.form.get('category', 'GenAI').strip()
+    tags = [t.strip() for t in request.form.get('tags', '').split(',') if t.strip()]
+    summary = request.form.get('summary', '').strip()
+    cover_gradient = request.form.get('cover_gradient', 'gradient-1')
+    cover_emoji = request.form.get('cover_emoji', '🤖').strip()
+    featured = request.form.get('featured') == 'on'
+    post_date = request.form.get('date', str(date.today()))
+
+    if existing_slug:
+        slug = existing_slug
+    else:
+        slug_base = f"{post_date}-{slugify(title)}"
+        slug = slug_base
+        i = 1
+        while os.path.exists(os.path.join(POSTS_DIR, f'{slug}.md')):
+            slug = f'{slug_base}-{i}'
+            i += 1
+
+    post_obj = frontmatter.Post(
+        content,
+        title=title,
+        date=post_date,
+        category=category,
+        tags=tags,
+        summary=summary,
+        cover_gradient=cover_gradient,
+        cover_emoji=cover_emoji,
+        author='Shashi Shekhar',
+        featured=featured,
+    )
+
+    post_path = os.path.join(POSTS_DIR, f'{slug}.md')
+    with open(post_path, 'w', encoding='utf-8') as f:
+        f.write(frontmatter.dumps(post_obj))
+
+    flash('Post saved successfully!', 'success')
+    return redirect(url_for('post_detail', slug=slug))
+
+
+# ── public routes ─────────────────────────────────────────────────────────────
 
 @app.route('/')
 def index():
@@ -213,6 +283,82 @@ def about():
 def category_view(category):
     return redirect(url_for('blog', category=category))
 
+
+# ── admin routes ──────────────────────────────────────────────────────────────
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if session.get('admin'):
+        return redirect(url_for('admin_dashboard'))
+    error = None
+    if request.method == 'POST':
+        u = request.form.get('username', '')
+        p = request.form.get('password', '')
+        if hmac.compare_digest(u, ADMIN_USER) and hmac.compare_digest(p, ADMIN_PASS):
+            session.permanent = True
+            session['admin'] = True
+            return redirect(url_for('admin_dashboard'))
+        error = 'Invalid username or password.'
+    return render_template('admin/login.html', error=error, site=SITE_CONFIG)
+
+
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin', None)
+    return redirect(url_for('index'))
+
+
+@app.route('/admin')
+@admin_required
+def admin_dashboard():
+    posts = get_all_posts()
+    return render_template('admin/dashboard.html', posts=posts, site=SITE_CONFIG)
+
+
+@app.route('/admin/new', methods=['GET', 'POST'])
+@admin_required
+def admin_new():
+    if request.method == 'POST':
+        return _save_post(None)
+    return render_template('admin/editor.html', post=None, site=SITE_CONFIG)
+
+
+@app.route('/admin/edit/<slug>', methods=['GET', 'POST'])
+@admin_required
+def admin_edit(slug):
+    post_path = os.path.join(POSTS_DIR, f'{slug}.md')
+    if not os.path.exists(post_path):
+        abort(404)
+    if request.method == 'POST':
+        return _save_post(slug)
+    with open(post_path, 'r', encoding='utf-8') as f:
+        p = frontmatter.load(f)
+    post_data = {
+        'slug': slug,
+        'title': p.get('title', ''),
+        'date': str(p.get('date', date.today())),
+        'category': p.get('category', 'GenAI'),
+        'tags': ', '.join(p.get('tags', [])),
+        'summary': p.get('summary', ''),
+        'cover_gradient': p.get('cover_gradient', 'gradient-1'),
+        'cover_emoji': p.get('cover_emoji', '🤖'),
+        'featured': p.get('featured', False),
+        'content': p.content,
+    }
+    return render_template('admin/editor.html', post=post_data, site=SITE_CONFIG)
+
+
+@app.route('/admin/delete/<slug>', methods=['POST'])
+@admin_required
+def admin_delete(slug):
+    post_path = os.path.join(POSTS_DIR, f'{slug}.md')
+    if os.path.exists(post_path):
+        os.remove(post_path)
+        flash('Post deleted.', 'info')
+    return redirect(url_for('admin_dashboard'))
+
+
+# ── error handlers ────────────────────────────────────────────────────────────
 
 @app.errorhandler(404)
 def not_found(e):
