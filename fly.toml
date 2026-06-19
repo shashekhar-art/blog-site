@@ -1,5 +1,5 @@
 app = "shashi-ai-blog"
-primary_region = "sin"
+primary_region = "iad"
 
 [build]
 
