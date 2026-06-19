@@ -19,7 +19,7 @@ SITE_CONFIG = {
     'title': 'Shashi Shekhar Insights',
     'author': 'Shashi Shekhar',
     'description': 'Practical insights on Python, AI, Generative AI, Data Science & emerging technology',
-    'url': 'https://shekhar-insight-blogs.fly.dev',
+    'url': 'https://shekhar-insight-blog.fly.dev',
     'linkedin': 'https://www.linkedin.com/in/shashi-shekhar-18octo/',
     'github': 'https://github.com/shashi-shekhar',
     'twitter': 'https://twitter.com/shashi_ai',

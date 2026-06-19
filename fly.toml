@@ -1,4 +1,4 @@
-app = "shekhar-insight-blogs"
+app = "shekhar-insight-blog"
 primary_region = "iad"
 
 [build]
