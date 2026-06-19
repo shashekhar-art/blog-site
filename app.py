@@ -18,7 +18,7 @@ POSTS_PER_PAGE = 6
 SITE_CONFIG = {
     'title': 'Shashi Shekhar Insights',
     'author': 'Shashi Shekhar',
-    'description': 'Exploring Python, AI, GenAI, Data Science & Technology',
+    'description': 'Practical insights on Python, AI, Generative AI, Data Science & emerging technology',
     'url': 'https://shashi-ai-blog.fly.dev',
     'linkedin': 'https://www.linkedin.com/in/shashi-shekhar-18octo/',
     'github': 'https://github.com/shashi-shekhar',
